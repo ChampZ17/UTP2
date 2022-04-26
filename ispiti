@@ -1,0 +1,169 @@
+#include<iostream>
+using namespace std;
+// stuktura Datum
+struct Datum {
+    int d;
+    int m;
+    int g;
+};
+void info(Datum* date) {
+// dd/mm/gg
+    cout << date->d << "/" << date->m << "/" << date->g << ". ";
+}
+Datum* ucitaj_datum()
+{
+    Datum* x = new Datum;
+    cout <<"unesite dan, mjesec i godinu: ";
+    cin >> x->d;
+    cin >> x->m;
+    cin >> x->g;
+    return x;
+}
+// struktura Osoba
+struct Osoba {
+int id;
+char ime[15];
+};
+void info(Osoba* o) {
+        cout <<"Ime osobe je: "<<o->ime<<" id= "<<o->id<<". ";
+}
+// Studenti
+const int max_s = 5;
+Osoba studenti[max_s] = {
+        { 1, "Marko" },
+        { 2, "Darko" },
+        { 3, "Zarko" },
+        { 4, "Adil" },
+        { 5, "Faruk" }
+};
+Osoba* odaberite_osobu(Osoba niz[], int z)
+{
+    int a;
+    cout <<"Spisak osoba: "<<endl;
+    for (int i = 0; i <z; i++)
+    {
+        cout << i <<"Ime osobe: "<<niz[i].ime<<", ID: "<<niz[i].id<<endl;
+    }
+    cout <<"Unesite RB: ";
+    cin >> a;
+    Osoba* x = new Osoba;
+    x = niz+a;
+    return x;
+}
+Osoba o1 = { 534, "Nina B." };
+Osoba o2 = { 435, "Jasmin A."};
+Osoba o3 = { 256, "Denis M." };
+Osoba o4 = { 325, "Emina J." };
+Osoba o5 = { 914, "Zanin V." };
+const int max_i = 5;
+Osoba ispitivaci[max_i] = {o1, o2, o3, o4, o5,};
+struct PrijavaZaIspit
+{
+    Osoba* student;
+    Datum* datum_prijave;
+    Datum* datum_odjave;
+    int ocjena;
+};
+const int max_p = 100;
+struct Ispit {
+    Osoba* ispitivac;
+    Datum* datum_ispita;
+    char predmet[10];
+    int brojac_prijavljenih;
+    PrijavaZaIspit* prijave = new PrijavaZaIspit[max_p];
+};
+Ispit* ucitaj_ispit()
+{
+    Ispit* x = new Ispit;
+    cout <<"Unesite predmet "<<endl;
+    cin >> x->predmet;
+    cout <<"Odaberite ispitivaca"<<endl;
+    x->ispitivac=odaberite_osobu(ispitivaci, max_i);
+    cout <<"Unesite datum ispita"<<endl;
+    x->datum_ispita=ucitaj_datum();
+    x->brojac_prijavljenih = 0;
+    return x;
+}
+void info(PrijavaZaIspit* p)
+{
+         cout <<"Student: ";
+        info(p->student);
+        cout <<" Datum prijave: ";
+        info(p->datum_prijave);
+        cout <<" Datum odjave: ";
+        info(p->datum_odjave);
+        cout <<endl;
+}
+void prikazi_ispite(Ispit* ispiti, int max)
+{
+    for (int i = 0; i <max; i++)
+    {
+        cout << i+1 <<". ";
+        info(ispiti[i].datum_ispita);
+        info(ispiti[i].ispitivac);
+        cout <<"Predmet -> "<<ispiti[i].predmet ;
+        cout <<", \tBroj prijavljenih: "<<ispiti[i].brojac_prijavljenih<<endl;}
+    }
+Ispit* odaberite_ispit(Ispit* ispiti, int max)
+{
+    prikazi_ispite(ispiti, max);
+    cout <<"Unesite RB ispita: ";
+    int x;
+    cin >> x;
+    return &ispiti[x - 1];
+}
+int main()
+{
+    const int max_ispiti = 10;
+    Ispit* ispiti = new Ispit[max_ispiti];
+    int brojac_ispita = 0;
+    int x;
+    do
+    {
+        cout <<"1. Ispiti - prikazi sve"<<endl;
+        cout <<"2. Ispiti - dodaj novi (zakazi novi ispit)"<<endl;
+        cout <<"3. Prijavljeni za ispit: prikazi sve (za ispit x)"<<endl;
+        cout <<"4. Prijavljeni za ispit: dodaj novu prijavu (za ispit x)"<<endl;
+        cout <<"5. Evidentiraj sve ocjene (za ispit x)"<<endl;
+        cout <<"0. EXIT"<<endl;
+        cin >> x;
+        if (x == 1)
+        {
+            prikazi_ispite(ispiti, brojac_ispita);
+        }
+        if (x == 2)
+        {
+            Ispit* i =ucitaj_ispit();
+            ispiti[brojac_ispita] = *i;
+            brojac_ispita++;
+        }
+        if (x == 3)
+        {
+            Ispit* i =odaberite_ispit(ispiti, brojac_ispita);
+            for (int j = 0; j<i->brojac_prijavljenih; j++)
+            {
+                PrijavaZaIspit& p = i->prijave[j];
+                info(&p);
+            }
+        }
+        if (x == 4)
+        {
+            Ispit* i = odaberite_ispit(ispiti, brojac_ispita);
+            PrijavaZaIspit novaP;
+            novaP.student=odaberite_osobu(studenti, max_s);
+            novaP.datum_prijave=ucitaj_datum();
+            i->prijave[i->brojac_prijavljenih++] = novaP;
+        }
+        if (x == 5)
+        {
+            Ispit* i = odaberite_ispit(ispiti, brojac_ispita);
+            for (int j = 0; j<i->brojac_prijavljenih; j++)
+            {
+                info(i->prijave[j].student);
+                cout <<", Unesite ocjenu sa ispita: ";
+                cin >> i->prijave[j].ocjena;
+            }
+        }
+    } while (x != 0);
+    return 0;
+}
